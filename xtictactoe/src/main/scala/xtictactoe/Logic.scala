@@ -54,10 +54,12 @@ object Logic {
     * @return A new `Game` with board of size `sizeOpt` (or a default value)
     */
   def initBoard(sizeOpt: Option[Int], winSize: Option[Int]): Game = {
-    // Here we ignore the input and construct a board of size 2
-    // TODO: change the definition to create a board of the size given in `sizeOpt`
-    val board = List(List(Empty, Empty), List(Empty, Empty), List(Empty, Empty))
-    Game(board, 2, 2)
+    val defaultSize = 3
+    val size = sizeOpt.getOrElse[Int](defaultSize)
+
+    val board = List.fill(size)(List.fill(size)(Empty))
+
+    Game(board, size, winSize.getOrElse[Int](defaultSize))
   }
 
   /**
@@ -67,8 +69,19 @@ object Logic {
     * @return
     */
   def view(game: Game): String = {
-    // TODO: Construct a nice and readable representation of the board
-    game.board.transpose.mkString("\n")
+    def drawField(field: Field): String = field match {
+      case piece: Piece => piece.player match {
+        case Player1 => "[X]"
+        case Player2 => "[O]"
+      }
+      case _ => "[ ]"
+    }
+
+    val board = game.board
+    val draw = board.map { column => column.map { field => drawField(field) }.mkString("") }
+
+
+    draw.mkString("\n")
   }
 
   /**
@@ -106,8 +119,18 @@ object Logic {
     * @return An `Either` containing either an error message in `Left` or the new board (list of columns) in `Right`.
     */
   def updateBoard(game: Game, player: Player, row: Int, column: Int): Either[String, Board] = {
-    // We return the original board here
-    // TODO: Implement! Create an updated board or produce an error message.
-    Right(game.board)
+    val colIndex = column - 1
+    val rowIndex = row - 1
+
+    if (column > game.size | row > game.size ) return Left("The column or row value is out of bounds.")
+
+    val fieldToUpdate = game.board(colIndex)(rowIndex)
+    val newColumn = game.board(colIndex).updated(rowIndex, Piece(player))
+    val newBoard = game.board.updated(colIndex, newColumn)
+
+    fieldToUpdate match {
+      case _: Piece => Left("This field is already occupied.")
+      case _ => Right(newBoard)
+    }
   }
 }
