@@ -10,7 +10,7 @@ import cats.Functor
 object Functors {
 
   // a) Implement implicit Functor[List] instance.
-  implicit val functorList = new Functor[List] {
+  implicit val functorList: Functor[List] = new Functor[List] {
     def map[A, B](fa: List[A])(f: A => B): List[B] = { fa.map(item => f(item)) }
   }
 
