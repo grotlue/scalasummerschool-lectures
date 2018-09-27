@@ -33,4 +33,9 @@ object Applicatives {
                    x: List[Int],
                    y: List[Int]): List[String] =
     Applicative[List].ap(x.map(f))(y)
+
+//  Uglier but better solution as it uses the map method of Applicative and not of List,
+//  so you are working with the same type. Usually you can use the <*> operator coming from cats
+//  val appl = Applicative[List]
+//  appl.ap(appl.map(x)(f))(y)
 }
