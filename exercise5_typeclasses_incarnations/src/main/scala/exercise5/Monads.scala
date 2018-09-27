@@ -2,6 +2,8 @@ package exercise5
 
 import cats.Monad
 
+import scala.annotation.tailrec
+
 /** A Monad trait has the following abstract methods:
   *   new Monad[List] {
   *     def pure[A](a: A): List[A] = ???
@@ -21,12 +23,26 @@ object Monads {
     def flatMap[A, B](fa: List[A])(f: A => List[B]): List[B] = fa.flatMap(f)
 
     def tailRecM[A, B](a: A)(f: A => List[Either[A, B]]): List[B] = {
-      f(a).foldLeft(List.empty[B]) { (acc, item) =>
-        item match {
-          case Right(v) => v +: acc
-          case _        => acc
+      // Not sure if tailrec
+//      f(a).foldLeft(List.empty[B]) { (acc, item) =>
+//        item match {
+//          case Right(v) => v +: acc
+//          case _        => acc
+//        }
+//      }
+      @tailrec
+      def loop(list: List[Either[A, B]], acc: List[B]): List[B] = {
+        list match {
+          case Nil => acc
+          case head :: tail =>
+            head match {
+              case Right(v) => loop(tail, v +: acc)
+              case Left(_)  => loop(tail, acc)
+            }
         }
       }
+
+      loop(f(a), List.empty)
     }
   }
 
